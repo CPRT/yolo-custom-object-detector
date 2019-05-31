@@ -8,11 +8,11 @@ imgsize = (700,700)
 
 ap = argparse.ArgumentParser()
 ap.add_argument('-c', '--config', 
-                help = 'path to config file', default="custom/yolov3-tiny.cfg")
+                help = 'path to config file', default="./custom/yolov3-tiny.cfg")
 ap.add_argument('-w', '--weights', 
                 help = 'path to pre-trained weights', default="../backup/yolov3-tiny.backup")
 ap.add_argument('-cl', '--classes', 
-                help = 'path to objects.names',default="custom/objects.names")
+                help = 'path to objects.names',default="./custom/objects.names")
 ap.add_argument('-s', '--server',
                 help = 'yes to connect to server, no to not', default='no')
 args = ap.parse_args()
