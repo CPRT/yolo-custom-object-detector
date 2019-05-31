@@ -17,8 +17,9 @@ ap.add_argument('-s', '--server',
                 help = 'yes to connect to server, no to not', default='no')
 args = ap.parse_args()
 
-
+WheelControl = {"l":0, "r":0}
 # Connect to the Rover control server through a websocket
+
 if 'yes' in args.server:
     ws = websocket.create_connection("ws://192.168.0.107:9020/locomotion")
     WheelControl = {"l":0, "r":0}
@@ -31,7 +32,12 @@ def getOutputsNames(net):
 
 # Send a message to the Server through the WebSocket telling the rover to turn in a certain way
 def SendMsgToServer(message):
-    ws.send(json.dumps(message))
+    if 'yes' in args.server:
+        ws.send(json.dumps(message))
+
+# Define a window to show the cam stream on it
+#window_title= "Rubiks Detector"   
+#cv2.namedWindow(window_title, cv2.WINDOW_NORMAL)
 
 # Load names classes
 classes = None
@@ -46,7 +52,7 @@ COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 net = cv2.dnn.readNet(args.weights, args.config)
 
 # Define video capture for default cam
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 
 while cv2.waitKey(1) < 0 or False:
@@ -98,8 +104,8 @@ while cv2.waitKey(1) < 0 or False:
     
     # apply non-maximum suppression algorithm on the bounding boxes
     indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
-    
     for i in indices:
+
         i = i[0]
         box = boxes[i]
         x = box[0]
@@ -118,12 +124,11 @@ while cv2.waitKey(1) < 0 or False:
             WheelControl["l"] = 0
             WheelControl["r"] = 0
             print("straight")
-        
-        SendMsgToServer(WheelControl)
-   
+                 
+        SendMsgToServer(WheelControl)   
     # Put efficiency information.
     t, _ = net.getPerfProfile()
     label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
     cv2.putText(image, label, (0, 15), cv2.FONT_HERSHEY_SIMPLEX, .6, (255, 0, 0))
     
-    # cv2.imshow(window_title, image)
+    #cv2.imshow(window_title, image)
